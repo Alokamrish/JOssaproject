@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -24,6 +25,7 @@
         .dropdown-container .dropdown {
             margin-right: 110px;
         }
+        
     </style>
 
     <link rel="stylesheet" type="text/css" href="{% static 'new/main.css' %}">
@@ -37,7 +39,7 @@
     <header class="site-header">
         <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
             <div class="container">
-                <a class="navbar-brand mr-4" href="{% url 'josaa-home'%}">JOSAA Analysis</a>
+             <a class="navbar-brand mr-4" href="{% url 'josaa-home'%}">JOSAA ANALYSIS</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -46,6 +48,18 @@
                         <a class="nav-item nav-link" href="{% url 'josaa-home'%}">Home</a>
                         <a class="nav-item nav-link" href="{% url 'josaa-about' %}">About</a>
                         <a class="nav-item nav-link" href="{% url 'josaa-contact' %}">Contact me</a>
+                         <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="faqDropdown" role="button" data-toggle="dropdown">
+                                FAQ
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="faqDropdown">
+                                <a class="dropdown-item" href="{% url 'iitb' college='Indian Institute of Technology Bombay'%}">(1) CSE & other Branches in IIT Bombay</a>
+                                <a class="dropdown-item" href="{% url 'iitb' college='Indian Institute of Technology Guwahati'%}">(2) CSE & other Branches in IIT Guwahati</a>
+                                <a class="dropdown-item" href="{% url 'iitmech' college='Indian Institute of Technology Bombay'%}">(3) Mechanical & Core Branches in IIT Bombay</a>
+                                <a class="dropdown-item" href="{% url 'iitmech' college='Indian Institute of Technology Guwahati'%}">(4) Mechanical & Core Branches in IIT Guwahati</a>
+                                <a class="dropdown-item" href="{% url 'iit-list'%}">(5) Famous IITs preferred by students</a>
+                            </div>
+                        </li>
                     </div>
                 </div>
             </div>
