@@ -1,46 +1,12 @@
-
-{% load static %} 
+{% extends "new/base.html" %}
+{% load static %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <link rel="stylesheet" type="text/css" href="{% static 'new/main.css' %}">
-
-    {% if title %}
-        <title>Django Project - {{title}}</title>
-    {% else %}
-        <title>Django Project</title>
-    {% endif %}
-</head>
-<body>
-    <!-- Navigation bar -->
-    <header class="site-header">
-        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
-            <div class="container">
-                <a class="navbar-brand mr-4" href="{% url 'josaa-home'%}"><h4>JOSAA ANALYSIS BY ALOK</h4></a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarToggle">
-                    <div class="navbar-nav mr-auto">
-                        <a class="nav-item nav-link" href="{% url 'josaa-home'%}">Home</a>
-                        <a class="nav-item nav-link" href="{% url 'josaa-about' %}">About</a>
-                        <a class="nav-item nav-link" href="{% url 'josaa-contact' %}">Contact me</a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
 <script>
     var admissionsData = JSON.parse('{{ admissions_data|escapejs }}');
     var selectedGender = "Gender-Neutral"; // Default value
     var catg = "OPEN"; // Default value
+    var Year1 = "0";
 
     function changeCategory(category) {
         document.getElementById("categoryDropdown").innerText = category;
@@ -52,54 +18,227 @@
         selectedGender = gender;
     }
 
+    function changeyear(year) {
+        document.getElementById("YearDropdown").innerText = year;
+        Year1 = year;
+    }
+
     function changefile() {
         let rank = document.querySelector("#rank").value;
         let tbody = document.querySelector("#filteredTable tbody");
-        tbody.innerHTML = ""; // Clear the existing table rows
+        tbody.innerHTML = ""; // Clear old rows
+
+        let found = false; // Flag to check if any college matches
 
         for (let i = 0; i < admissionsData.length; i++) {
             let adm = admissionsData[i].fields;
-            let academicProgramName = adm.academic_program_name;
             let closingRank = adm.closing_rank;
             let openingRank = adm.opening_rank;
             let gender = adm.gender;
             let Year = adm.year;
-            let round1=adm.round;
-            console.log(Year);
             let category = adm.seat_type;
 
-            if (rank <= closingRank && selectedGender === gender && catg === category) {
+            if (rank <= closingRank && selectedGender === gender && catg === category && Year1 == Year) {
                 let row = tbody.insertRow();
-                let cell1 = row.insertCell(0);
-                let cell2 = row.insertCell(1);
-                let cell3 = row.insertCell(2);
-                let cell4 = row.insertCell(3);
-                let cell5 = row.insertCell(4);
-                let cell6 = row.insertCell(5);
-                let cell7 = row.insertCell(6);
-                let cell8 = row.insertCell(7);
+                row.insertCell(0).innerHTML = adm.institute;
+                row.insertCell(1).innerHTML = adm.academic_program_name;
+                row.insertCell(2).innerHTML = openingRank;
+                row.insertCell(3).innerHTML = closingRank;
+                row.insertCell(4).innerHTML = gender;
+                row.insertCell(5).innerHTML = Year;
+                row.insertCell(6).innerHTML = category;
 
-                cell1.innerHTML = adm.institute;
-                cell2.innerHTML = adm.academic_program_name;
-                cell3.innerHTML = openingRank;
-                cell4.innerHTML = closingRank;
-                cell5.innerHTML = gender;
-                cell6.innerHTML = Year;
-                cell7.innerHTML = category;
-                cell8.innerHTML = round1;
+                found = true; // Found at least one matching college
             }
+        }
+
+        // Show message if no colleges found
+        if(Year1==0){
+             let row = tbody.insertRow();
+            let cell = row.insertCell(0);
+            cell.colSpan = 7; // Span across all table columns
+             cell.innerHTML = "Plz select year"; 
+              cell.style.textAlign = "center";
+            cell.style.color = "#ff0000";
+            cell.style.fontWeight = "600";
+        }
+       else if (!found) {
+            let row = tbody.insertRow();
+            let cell = row.insertCell(0);
+            cell.colSpan = 7; // Span across all table columns
+            cell.innerHTML = "Sorry, there is no IIT Seat available at your rank in any branch for the selected year, category, and gender.";
+            cell.style.textAlign = "center";
+            cell.style.color = "#ff0000";
+            cell.style.fontWeight = "600";
         }
     }
 </script>
 
-<div>
-    <h4 class="alok1">Show the list of my rank</h4>
-    <input type="number" id="rank" name="rank">
-    <div class="dropdown d-inline-block ml-3">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            OPEN
+<style>
+    /* Page container */
+    .center-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 5px;
+        margin-top: 3rem;
+    }
+
+    h4.alok1 {
+        font-size: 26px;
+        font-weight: 700;
+        color: #182118;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    /* Inputs & dropdowns */
+    .form-control-custom,
+    .dropdown .btn,
+    input[type="submit"] {
+        width: 320px;
+        padding: 12px 15px;
+        font-size: 16px;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 12px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+
+    .form-control-custom {
+        border: 1px solid #ddd;
+        background: #f5f5f5;
+        color: #424242;
+    }
+
+    #rank {
+        background-color: #c7d4c8;
+    }
+
+    #rank::placeholder {
+        color: #181414;
+        font-size: 15px;
+    }
+
+    .dropdown .btn {
+        background-color: #c7d4c8;
+        color: #181414;
+        border: none;
+        font-weight: 600;
+    }
+
+    .dropdown .btn:hover {
+        background-color: #ebebed;
+    }
+
+    input[type="submit"] {
+        background-color: #c7d4c8;
+        color: #141212;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #388e3c;
+        color: #fff;
+    }
+
+    /* Table */
+    #filteredTable {
+     margin-top: 40px;
+    width: 95%;
+    max-width: 1100px;
+    text-align: center;
+    border-radius: 10px;
+    border-collapse: separate;   /* instead of collapse */
+    border-spacing: 0;          /* removes gaps between cells */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+   }
+#filteredTable th:first-child {
+    border-top-left-radius: 5px;
+}
+
+#filteredTable th:last-child {
+    border-top-right-radius: 5px;
+}
+
+#filteredTable tr:last-child td:first-child {
+    border-bottom-left-radius: 5px;
+}
+
+#filteredTable tr:last-child td:last-child {
+    border-bottom-right-radius: 5px;
+}
+
+    #filteredTable th,
+    #filteredTable td {
+        padding: 14px 18px;
+        border: 1px solid #141111;
+    }
+
+    #filteredTable th {
+        background: #f3f2f4;
+        color: #141313;
+        font-weight: 800;
+    }
+
+    #filteredTable td {
+        background: #fafafa;
+        color:  #141313;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-control-custom,
+        .dropdown .btn,
+        input[type="submit"] {
+            width: 80%;
+        }
+
+        #filteredTable {
+            font-size: 14px;
+        }
+
+        #filteredTable th,
+        #filteredTable td {
+            padding: 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-control-custom,
+        .dropdown .btn,
+        input[type="submit"] {
+            width: 95%;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        #filteredTable {
+            font-size: 13px;
+        }
+
+        #filteredTable th,
+        #filteredTable td {
+            padding: 8px;
+        }
+    }
+</style>
+
+<div class="center-container">
+    <h4 class="alok1">Show the list of colleges on my rank</h4>
+
+    <!-- Rank input -->
+    <input type="number" id="rank" name="rank" class="form-control-custom" placeholder="Rank">
+
+    <!-- Category dropdown -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryDropdown" data-toggle="dropdown">
+            Category: OPEN
         </button>
-        <div class="dropdown-menu" aria-labelledby="categoryDropdown">
+        <div class="dropdown-menu dropdown-menu-right">
             <a class="dropdown-item" href="#" onclick="changeCategory('OPEN')">OPEN</a>
             <a class="dropdown-item" href="#" onclick="changeCategory('EWS')">EWS</a>
             <a class="dropdown-item" href="#" onclick="changeCategory('OBC-NCL')">OBC-NCL</a>
@@ -112,20 +251,40 @@
             <a class="dropdown-item" href="#" onclick="changeCategory('ST (PwD)')">ST (PwD)</a>
         </div>
     </div>
-    <div class="dropdown d-inline-block ml-3">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="genderDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+    <!-- Year dropdown -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="YearDropdown" data-toggle="dropdown">
+            Year
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="#" onclick="changeyear('2016')">2016</a>
+            <a class="dropdown-item" href="#" onclick="changeyear('2017')">2017</a>
+            <a class="dropdown-item" href="#" onclick="changeyear('2018')">2018</a>
+            <a class="dropdown-item" href="#" onclick="changeyear('2019')">2019</a>
+            <a class="dropdown-item" href="#" onclick="changeyear('2020')">2020</a>
+            <a class="dropdown-item" href="#" onclick="changeyear('2021')">2021</a>
+            <a class="dropdown-item" href="#" onclick="changeyear('2022')">2022</a>
+            <a class="dropdown-item" href="#" onclick="changeyear('2023')">2023</a>
+        </div>
+    </div>
+
+    <!-- Gender dropdown -->
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="genderDropdown" data-toggle="dropdown">
             Gender-Neutral
         </button>
-        <div class="dropdown-menu" aria-labelledby="genderDropdown">
+        <div class="dropdown-menu dropdown-menu-right">
             <a class="dropdown-item" href="#" onclick="changeGender('Gender-Neutral')">Gender-Neutral</a>
             <a class="dropdown-item" href="#" onclick="changeGender('Female-only (including Supernumerary)')">Female</a>
         </div>
     </div>
-    <input type="submit" onclick="changefile()">
-</div>
-<div>
-    <h1>Filtered Data Table</h1>
-    <table id="filteredTable" border="1">
+
+    <!-- Submit button -->
+    <input type="submit" onclick="changefile()" value="Submit">
+
+    <!-- Results table -->
+    <table id="filteredTable">
         <thead>
             <tr>
                 <th>Institute</th>
@@ -134,16 +293,11 @@
                 <th>Closing Rank</th>
                 <th>Gender</th>
                 <th>Year</th>
-                <th>category</th>
-                <th>round</th>
+                <th>Category</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Rows will be inserted here by JavaScript -->
-        </tbody>
+        <tbody></tbody>
     </table>
 </div>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 {% endblock content %}
